@@ -1,9 +1,18 @@
 apply plugin: 'com.android.application'
 
+def productionAds = project.findProperty('adsProduction') == 'true'
+gradle.taskGraph.whenReady { graph ->
+    if (!productionAds && graph.allTasks.any { it.name == 'bundleRelease' }) {
+        throw new GradleException('bundleRelease publica na loja: rode com -PadsProduction=true para usar os anúncios reais')
+    }
+}
+
 android {
     compileSdkVersion 34
     namespace "com.rotech.dezeroacinquenta"
     defaultConfig {
+        resValue 'string', 'adUnitID', productionAds ? 'ca-app-pub-9218769381944425/2583373193' : 'ca-app-pub-3940256099942544/6300978111'
+        resValue 'string', 'adIntersticialID', productionAds ? 'ca-app-pub-9218769381944425/3386579382' : 'ca-app-pub-3940256099942544/1033173712'
         applicationId "com.rotech.dezeroacinquenta"
         minSdkVersion 21
         targetSdkVersion 34
